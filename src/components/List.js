@@ -5,32 +5,39 @@ import { SearchContext } from "../App";
 
 const ORDER_BY = ["relevance", "newest", "active", "score"];
 const PAGE_SIZE = [15, 30, 50];
+const PAGE_BUTTON_COUNT = 5;
+const ELLIPSIS_MARK = "...";
 
 const List = () => {
   const { query } = useContext(SearchContext);
 
   const [posts, setPosts] = useState([]);
+  const [total, setTotal] = useState(0);
   const [order, setOrder] = useState(0);
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(1);
   const [pageSize, setPageSize] = useState(0);
   const [showTip, setShowTip] = useState(false);
 
-  const fetchPosts = async (q, tab, size) => {
-    if (!q) {
-      return;
-    }
-
-    const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}&tab=${ORDER_BY[tab]}&pagesize=${PAGE_SIZE[size]}`;
-    console.log(url, process.env.NODE_ENV);
-    const res = await fetch(url);
-    const json = await res.json();
-    console.log(json);
-
-    setPosts(json["data"]);
-  };
-
   useEffect(() => {
-    fetchPosts(query, order, pageSize);
-  }, [query, order, pageSize]);
+    const fetchPosts = async (q, tab, size, p) => {
+      if (!q) {
+        return;
+      }
+
+      const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}&tab=${ORDER_BY[tab]}&pagesize=${PAGE_SIZE[size]}&page=${p}`;
+      console.log(url, process.env.NODE_ENV);
+      const res = await fetch(url);
+      const json = await res.json();
+      console.log(json);
+
+      setPosts(json["data"]);
+      setTotal(json["meta"]["total"]);
+      setLastPage(Math.ceil(json["meta"]["total"] / PAGE_SIZE[pageSize]));
+    };
+
+    fetchPosts(query, order, pageSize, page);
+  }, [query, order, pageSize, page]);
 
   const getTagList = (tags) => {
     let list = (tags || "").match(/<[a-zA-Z0-9]*>/g) || [];
@@ -51,6 +58,36 @@ const List = () => {
     });
 
     return result;
+  };
+
+  const getPageList = () => {
+    const pages = [];
+    const lastPage = Math.ceil(total / PAGE_SIZE[pageSize]);
+
+    for (
+      let i = page - Math.floor(PAGE_BUTTON_COUNT / 2);
+      i <= page + Math.floor(PAGE_BUTTON_COUNT / 2);
+      i++
+    ) {
+      if (i > 0 && i <= lastPage) {
+        pages.push(i);
+      }
+    }
+
+    if (pages[0] > 1) {
+      if (pages[0] > 2) {
+        pages.unshift(ELLIPSIS_MARK);
+      }
+      pages.unshift(1);
+    }
+
+    if (pages[pages.length - 1] < lastPage) {
+      if (pages[pages.length - 1] < lastPage - 1) {
+        pages.push(ELLIPSIS_MARK);
+      }
+      pages.push(lastPage);
+    }
+    return pages;
   };
 
   return (
@@ -201,7 +238,7 @@ const List = () => {
       )}
       <div className="flex items-center mb-3">
         <div className="flex-1 font-bold mr-2 text-[13px]">
-          176,818 results{" "}
+          {total.toLocaleString("en-US")} results{" "}
         </div>
 
         <div>
@@ -330,52 +367,42 @@ const List = () => {
 
       <div className="flex my-4 text-[13px] justify-between">
         <div className="flex gap-1 items-center">
-          <div className="p-1 px-2 rounded bg-yellow-500 text-white">1</div>
-          <a
+          {getPageList().map((p) => (
+            <>
+              {p === ELLIPSIS_MARK ? (
+                <div className="mx-2">{p}</div>
+              ) : (
+                <button
+                  className={`p-1 px-2 rounded ${
+                    p === page
+                      ? "bg-yellow-500 text-white"
+                      : "border-gray border-[0.5px] hover:cursor-pointer "
+                  }`}
+                  onClick={() => setPage(p)}
+                >
+                  {p}
+                </button>
+              )}
+            </>
+          ))}
+          <button
             className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=2&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
+            onClick={() => setPage(page + 1)}
+            disabled={page === lastPage}
           >
-            2
-          </a>
-          <a
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=3&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-          >
-            3
-          </a>
-          <a
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=4&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-          >
-            4
-          </a>
-          <a
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=5&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-          >
-            5
-          </a>
-          <div className="">…</div>
-          <a
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=11788&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-          >
-            11788
-          </a>
-          <a
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            href="/search?page=2&amp;tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-          >
-            {" "}
             Next
-          </a>
+          </button>
         </div>
         <div className="flex items-center gap-1">
           {PAGE_SIZE.map((size, index) => (
             <div
               key={index}
               onClick={() => setPageSize(index)}
-              className={`p-1 px-2 rounded hover:cursor-pointer ${pageSize===index?'bg-yellow-500 text-white':'border-gray border-[0.5px]'}`}
+              className={`p-1 px-2 rounded hover:cursor-pointer ${
+                pageSize === index
+                  ? "bg-yellow-500 text-white"
+                  : "border-gray border-[0.5px]"
+              }`}
             >
               {size}
             </div>
