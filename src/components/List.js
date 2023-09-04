@@ -1,3 +1,5 @@
+import avatar from '../images/avatar.png';
+
 const List = () => {
   return (
     <div className="m-4">
@@ -50,8 +52,8 @@ const List = () => {
         </div>
       </div>
       <div className="border-t">
-        {Array(1).fill(0).map((item) => (
-          <div className="flex border-b p-[16px] gap-4 text-[13px]">
+        {Array(1).fill(0).map((item, index) => (
+          <div className="flex border-b p-[16px] gap-4 text-[13px]" key={index}>
             <div className="flex flex-col items-end gap-1">
               <div className="flex gap-1">
                 <span className="font-[500]">27072</span>
@@ -131,7 +133,7 @@ const List = () => {
                     {" "}
                     <div>
                       <img
-                        src="https://i.stack.imgur.com/FkjBe.png?s=32&amp;g=1"
+                        src={avatar}
                         alt="GManNickG's user avatar"
                         width="16"
                         height="16"
