@@ -9,7 +9,7 @@ const Layout = () => {
       <Header />
       <div className="container mx-auto flex flex-[1_0_auto]">
         <Sidebar />
-        <div className="border-l-[0.5px]">
+        <div className="border-l-[0.5px] flex-1">
           <Outlet />
         </div>
       </div>

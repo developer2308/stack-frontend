@@ -3,13 +3,23 @@ import avatar from "../images/avatar.png";
 import Moment from "moment";
 import { SearchContext } from "../App";
 
+const ORDER_BY = ["relevance", "newest", "active", "score"];
+const PAGE_SIZE = [15, 30, 50];
+
 const List = () => {
   const { query } = useContext(SearchContext);
 
   const [posts, setPosts] = useState([]);
+  const [order, setOrder] = useState(0);
+  const [pageSize, setPageSize] = useState(0);
+  const [showTip, setShowTip] = useState(false);
 
-  const fetchPosts = async (q) => {
-    const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}`;
+  const fetchPosts = async (q, tab, size) => {
+    if (!q) {
+      return;
+    }
+
+    const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}&tab=${ORDER_BY[tab]}&pagesize=${PAGE_SIZE[size]}`;
     console.log(url, process.env.NODE_ENV);
     const res = await fetch(url);
     const json = await res.json();
@@ -19,8 +29,8 @@ const List = () => {
   };
 
   useEffect(() => {
-    fetchPosts(query);
-  }, [query]);
+    fetchPosts(query, order, pageSize);
+  }, [query, order, pageSize]);
 
   const getTagList = (tags) => {
     let list = (tags || "").match(/<[a-zA-Z0-9]*>/g) || [];
@@ -29,9 +39,19 @@ const List = () => {
   };
 
   const highlight = (body) => {
-    let result = body.replace(/<img [^>]*>/gi, '');
+    let result = body;
+    const removePatterns = [
+      /<img [^>]*>/gi,
+      /<a [^>]*>/gi,
+      /<\/a>/gi,
+      /<code>[^>]*<\/code>/gi,
+    ];
+    removePatterns.forEach((pattern) => {
+      result = result.replace(pattern, "");
+    });
+
     return result;
-  }
+  };
 
   return (
     <div className="m-4">
@@ -39,7 +59,12 @@ const List = () => {
         <h1 className="text-[27px]">Search Results </h1>
         <div>
           <div className="text-sky-400">
-            <a href="/">Advanced Search Tips</a>
+            <div
+              className="hover:cursor-pointer"
+              onClick={() => setShowTip(!showTip)}
+            >
+              Advanced Search Tips
+            </div>
           </div>
         </div>
       </div>
@@ -49,6 +74,131 @@ const List = () => {
           Search options <span className="font-bold">not deleted</span>
         </div>
       </div>
+      {(showTip || !posts.length) && (
+        <table className="text-[13px] mb-8 w-full">
+          <thead>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Search type</th>
+              <th className="text-left p-1 border-t-[0.5px]">Search syntax</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Tags</th>
+              <td className="text-left p-1 border-t-[0.5px]">[tag]</td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Exact</th>
+              <td className="text-left p-1 border-t-[0.5px]">"words here"</td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Author</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                user:1234
+                <br />
+                user:me <span className="text-gray-400">(yours)</span>
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Score</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                score:3 <span className="text-gray-400">(3+)</span>
+                <br />
+                score:0 <span className="text-gray-400">(none)</span>
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Answers</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                answers:3 <span className="text-gray-400">(3+)</span>
+                <br />
+                answers:0 <span className="text-gray-400">(none)</span>
+                <br />
+                isaccepted:yes
+                <br />
+                hasaccepted:no
+                <br />
+                inquestion:1234
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Views</th>
+              <td className="text-left p-1 border-t-[0.5px]">views:250</td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Code</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                code:"if (foo != bar)"
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Sections</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                title:apples
+                <br />
+                body:"apples oranges"
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">URL</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                url:"*.example.com"
+              </td>
+            </tr>
+
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Saves</th>
+              <td className="text-left p-1 border-t-[0.5px]">in:saves</td>
+            </tr>
+
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Staging Ground</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                staging-ground:1
+                <br />
+                sg:1
+              </td>
+            </tr>
+
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Status</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                closed:yes
+                <br />
+                duplicate:no
+                <br />
+                migrated:no
+                <br />
+                wiki:no
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Types</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                is:question
+                <br />
+                is:answer
+                <br />
+                is:article
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Exclude</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                -[tag]
+                <br />
+                -apples
+              </td>
+            </tr>
+            <tr>
+              <th className="text-left p-1 border-t-[0.5px]">Collective</th>
+              <td className="text-left p-1 border-t-[0.5px]">
+                collective:"Name"
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      )}
       <div className="flex items-center mb-3">
         <div className="flex-1 font-bold mr-2 text-[13px]">
           176,818 results{" "}
@@ -56,33 +206,22 @@ const List = () => {
 
         <div>
           <div className="flex text-[13px]">
-            <a
-              className="p-2 bg-gray-300 rounded-l text-gray-500 border-[0.5px] border-gray-200"
-              href="/search?tab=relevance&amp;q=array%20sort&amp;searchOn=3"
-            >
-              Relevance
-            </a>
-            <a
-              href="/search?tab=newest&amp;q=array%20sort&amp;searchOn=3"
-              className="p-2 text-gray-500 border-[0.5px] border-gray-200"
-            >
-              Newest
-            </a>
-            <a
-              href="/search?tab=newest&amp;q=array%20sort&amp;searchOn=3"
-              className="p-2 text-gray-500 border-[0.5px] border-gray-200"
-            >
-              Active
-            </a>
-            <a
-              href="/search?tab=newest&amp;q=array%20sort&amp;searchOn=3"
-              className="p-2 rounded-r text-gray-500 border-[0.5px] border-gray-200"
-            >
-              Score
-            </a>
+            {ORDER_BY.map((item, index) => (
+              <div
+                key={index}
+                className={`p-2 text-gray-400 border-[0.5px] capitalize border-gray-200 hover:cursor-pointer 
+                ${index === 0 ? "rounded-l" : ""}
+                ${index === ORDER_BY.length - 1 ? "rounded-r" : ""}
+                ${order === index ? "bg-gray-300" : ""}`}
+                onClick={() => setOrder(index)}
+              >
+                {item}
+              </div>
+            ))}
           </div>
         </div>
       </div>
+
       <div className="border-t">
         {posts.map((post, index) => (
           <div className="flex border-b p-[16px] gap-4 text-[13px]" key={index}>
@@ -232,24 +371,15 @@ const List = () => {
           </a>
         </div>
         <div className="flex items-center gap-1">
-          <a
-            href="/search?tab=Relevance&amp;pagesize=15&amp;q=array%20sort&amp;searchOn=3"
-            className="p-1 px-2 rounded bg-yellow-500 text-white"
-          >
-            15
-          </a>
-          <a
-            href="/search?tab=Relevance&amp;pagesize=30&amp;q=array%20sort&amp;searchOn=3"
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-          >
-            30
-          </a>
-          <a
-            href="/search?tab=Relevance&amp;pagesize=50&amp;q=array%20sort&amp;searchOn=3"
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-          >
-            50
-          </a>
+          {PAGE_SIZE.map((size, index) => (
+            <div
+              key={index}
+              onClick={() => setPageSize(index)}
+              className={`p-1 px-2 rounded hover:cursor-pointer ${pageSize===index?'bg-yellow-500 text-white':'border-gray border-[0.5px]'}`}
+            >
+              {size}
+            </div>
+          ))}
           <span className="px-2">per page</span>
         </div>
       </div>
