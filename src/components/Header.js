@@ -1,5 +1,23 @@
+import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { SearchContext } from "../App";
+
 const Header = () => {
+  const [text, setText] = useState("");
+
+  const { setQuery } = useContext(SearchContext);
+
+  const onChange = (event) => {
+    setText(event.target.value);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setQuery(text);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [text, setQuery]);
+
   return (
     <div className="border-b w-full items-center h-[56px]">
       <div className="container mx-auto flex border-b w-full items-center h-[56px] gap-2 text-gray-500 px-2">
@@ -11,12 +29,15 @@ const Header = () => {
               fill="#F48024"
             ></path>
           </svg>
-          <span className="">stack</span><span className="font-bold text-black">overflow</span>
+          <span className="">stack</span>
+          <span className="font-bold text-black">overflow</span>
         </Link>
         <div className="flex w-full relative">
           <input
             name="q"
             type="text"
+            value={text}
+            onChange={onChange}
             className="border flex-1 p-1 px-2 rounded text-[13px] pl-8"
           />
           <svg

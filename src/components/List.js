@@ -1,6 +1,38 @@
-import avatar from '../images/avatar.png';
+import { useContext, useEffect, useState } from "react";
+import avatar from "../images/avatar.png";
+import Moment from "moment";
+import { SearchContext } from "../App";
 
 const List = () => {
+  const { query } = useContext(SearchContext);
+
+  const [posts, setPosts] = useState([]);
+
+  const fetchPosts = async (q) => {
+    const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}`;
+    console.log(url, process.env.NODE_ENV);
+    const res = await fetch(url);
+    const json = await res.json();
+    console.log(json);
+
+    setPosts(json["data"]);
+  };
+
+  useEffect(() => {
+    fetchPosts(query);
+  }, [query]);
+
+  const getTagList = (tags) => {
+    let list = (tags || "").match(/<[a-zA-Z0-9]*>/g) || [];
+    list = list.map((tag) => tag.substring(1, tag.length - 1));
+    return list;
+  };
+
+  const highlight = (body) => {
+    let result = body.replace(/<img [^>]*>/gi, '');
+    return result;
+  }
+
   return (
     <div className="m-4">
       <div className="flex justify-between flex-wrap items-center mb-3">
@@ -12,7 +44,7 @@ const List = () => {
         </div>
       </div>
       <div className="text-[12px] mb-3">
-        <div className="mb-1">Results for array sort</div>
+        <div className="mb-1">Results for {query}</div>
         <div>
           Search options <span className="font-bold">not deleted</span>
         </div>
@@ -52,11 +84,11 @@ const List = () => {
         </div>
       </div>
       <div className="border-t">
-        {Array(1).fill(0).map((item, index) => (
+        {posts.map((post, index) => (
           <div className="flex border-b p-[16px] gap-4 text-[13px]" key={index}>
             <div className="flex flex-col items-end gap-1">
               <div className="flex gap-1">
-                <span className="font-[500]">27072</span>
+                <span className="font-[500]">{post["VoteCount"] || 0}</span>
                 <span>votes</span>
               </div>
               <div className="flex items-center bg-green-800 text-white rounded p-1 gap-1 px-2">
@@ -68,11 +100,11 @@ const List = () => {
                 >
                   <path d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"></path>
                 </svg>{" "}
-                <span>25</span>
+                <span>{post["AnswerCount"]}</span>
                 <span>answers</span>
               </div>
               <div className="flex gap-1 text-red-700">
-                <span className="font-[500]">1.8m</span>
+                <span className="font-[500]">{post["ViewCount"]}</span>
                 <span>views</span>
               </div>
             </div>
@@ -82,7 +114,7 @@ const List = () => {
                   <svg
                     width="18"
                     height="18"
-                    className="inline"
+                    className="inline mb-1"
                     viewBox="0 0 18 18"
                   >
                     <path d="m4 15-3 3V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v9c0 1.09-.91 2-2 2H4Zm7.75-3.97c.72-.83.98-1.86.98-2.94 0-1.65-.7-3.22-2.3-3.83a4.41 4.41 0 0 0-3.02 0 3.8 3.8 0 0 0-2.32 3.83c0 1.29.35 2.29 1.03 3a3.8 3.8 0 0 0 2.85 1.07c.62 0 1.2-.11 1.71-.34.65.44 1 .68 1.06.7.23.13.46.23.7.3l.59-1.13a5.2 5.2 0 0 1-1.28-.66Zm-1.27-.9a5.4 5.4 0 0 0-1.5-.8l-.45.9c.33.12.66.29.98.5-.2.07-.42.11-.65.11-.61 0-1.12-.23-1.52-.68-.86-1-.86-3.12 0-4.11.8-.9 2.35-.9 3.15 0 .9 1.01.86 3.03-.01 4.08Z"></path>
@@ -90,45 +122,32 @@ const List = () => {
                 </span>
                 <a
                   href="/questions/11227809/why-is-processing-a-sorted-array-faster-than-processing-an-unsorted-array?r=SearchResults"
-                  className="text-sky-400 text-[17px]"
+                  className="text-sky-400 text-[17px] ml-1"
                 >
-                  Why is processing a sorted array faster than processing an
-                  unsorted array?
+                  {post["Title"]}
                 </a>
               </h3>
-              <div className="text-[13px] mb-2 line-clamp-2">
-                (Sorting itself takes more time than this one pass over the{" "}
-                <span className="font-bold">array</span>, so it's not actually
-                worth doing if we needed to calculate this for an unknown{" "}
-                <span className="font-bold">array</span>.) … Why is processing a
-                sorted <span className="font-bold">array</span> faster than
-                processing an unsorted <span className="font-bold">array</span>?
-                The code is summing up some independent terms, so the order
-                should not matter. …
-              </div>
+              <div
+                className="text-[13px] mb-2 line-clamp-2"
+                dangerouslySetInnerHTML={{ __html: highlight(post["Body"]) }}
+              ></div>
               <div>
                 <div>
                   <ul className="flex gap-2">
-                    <li>
-                      <a
-                        href="/questions/tagged/java"
-                        className="rounded bg-sky-200 py-1 px-2 text-[12px] text-sky-600"
-                      >
-                        java
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="/questions/tagged/c%2b%2b"
-                        className="rounded bg-sky-200 py-1 px-2 text-[12px] text-sky-600"
-                      >
-                        c++
-                      </a>
-                    </li>
+                    {getTagList(post["Tags"]).map((tag, index) => (
+                      <li key={index}>
+                        <a
+                          href="/questions/tagged/java"
+                          className="rounded bg-sky-200 py-1 px-2 text-[12px] text-sky-600"
+                        >
+                          {tag}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
 
-                <div className="flex gap-2 items-center text-[12px] justify-end">
+                <div className="flex gap-2 items-center text-[12px] justify-end mt-2">
                   <a href="/users/87234/gmannickg">
                     {" "}
                     <div>
@@ -144,19 +163,24 @@ const List = () => {
                   <div className="flex gap-2">
                     <div>
                       <a href="/users/87234/gmannickg" className="text-sky-400">
-                        GManNickG
+                        {post["DisplayName"]}
                       </a>
                     </div>
 
                     <ul>
                       <li>
-                        <span className="font-bold">494k</span>
+                        <span className="font-bold">{post["Reputation"]}</span>
                       </li>
                     </ul>
                   </div>
 
                   <time>
-                    asked <span>Jun 27, 2012 at 13:51</span>
+                    asked{" "}
+                    <span>
+                      {Moment(post["CreationDate"]).format(
+                        "MMM D, YYYY \\at H:mm"
+                      )}
+                    </span>
                   </time>
                 </div>
               </div>
