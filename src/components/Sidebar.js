@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
-    <div className="flex min-w-[164px] py-4 w-[164px]">
+    <div className="hidden md:flex min-w-[164px] py-4 w-[164px] border-r-[0.5px] ">
       <div className="text-[13px] text-gray-500 w-full">
         <nav className="w-full">
           <ol className="w-full">

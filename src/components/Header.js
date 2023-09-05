@@ -19,8 +19,8 @@ const Header = () => {
   }, [text, setQuery]);
 
   return (
-    <div className="border-b w-full items-center h-[56px]">
-      <div className="container mx-auto flex border-b w-full items-center h-[56px] gap-2 text-gray-500 px-2">
+    <div className="fixed top-0 border-b w-full items-center h-[56px] border-t-[3px] border-t-yellow-500 bg-white">
+      <div className="container mx-auto flex w-full items-center h-[56px] gap-2 text-gray-500 px-2">
         <Link to="/" className="flex items-center gap-1">
           <svg aria-hidden="true" width="32" height="37" viewBox="0 0 32 37">
             <path d="M26 33v-9h4v13H0V24h4v9h22Z" fill="#BCBBBB"></path>
@@ -29,8 +29,10 @@ const Header = () => {
               fill="#F48024"
             ></path>
           </svg>
-          <span className="">stack</span>
-          <span className="font-bold text-black">overflow</span>
+          <div className="hidden sm:inline">
+            <span className="mr-1">stack</span>
+            <span className="font-bold text-black">overflow</span>
+          </div>
         </Link>
         <div className="flex w-full relative">
           <input

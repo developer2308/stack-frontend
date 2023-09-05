@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Moment from "moment";
 import { SearchContext } from "../App";
+import Loading from "./Loading";
 
 const ORDER_BY = ["relevance", "newest", "active", "score"];
 const PAGE_SIZE = [15, 30, 50];
@@ -13,31 +14,36 @@ const List = () => {
 
   const [posts, setPosts] = useState([]);
   const [total, setTotal] = useState(0);
-  const [order, setOrder] = useState(0);
+  const [order, setOrder] = useState(ORDER_BY[0]);
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
-  const [pageSize, setPageSize] = useState(0);
+  const [pageSize, setPageSize] = useState(PAGE_SIZE[0]);
   const [showTip, setShowTip] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const fetchPosts = async (q, tab, size, p) => {
-      if (!q) {
+    const fetchPosts = async () => {
+      if (!query) {
         return;
       }
-
-      const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${q}&tab=${ORDER_BY[tab]}&pagesize=${PAGE_SIZE[size]}&page=${p}`;
+      setIsLoading(true);
+      const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${query}&tab=${order}&pagesize=${pageSize}&page=${page}`;
       console.log(url, process.env.NODE_ENV);
       const res = await fetch(url);
       const json = await res.json();
       console.log(json);
-
+      setIsLoading(false);
       setPosts(json["data"]);
       setTotal(json["meta"]["total"]);
-      setLastPage(Math.ceil(json["meta"]["total"] / PAGE_SIZE[pageSize]));
+      setLastPage(Math.ceil(json["meta"]["total"] / pageSize));
     };
 
-    fetchPosts(query, order, pageSize, page);
+    fetchPosts();
   }, [query, order, pageSize, page]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [query, pageSize]);
 
   const getTagList = (tags) => {
     let list = (tags || "").match(/<[a-zA-Z0-9]*>/g) || [];
@@ -47,12 +53,7 @@ const List = () => {
 
   const highlight = (body) => {
     let result = body;
-    const removePatterns = [
-      /<img [^>]*>/gi,
-      /<a [^>]*>/gi,
-      /<\/a>/gi,
-      /<code>[^>]*<\/code>/gi,
-    ];
+    const removePatterns = [/<\/?[^>]+(>|$)/gi];
     removePatterns.forEach((pattern) => {
       result = result.replace(pattern, "");
     });
@@ -62,16 +63,23 @@ const List = () => {
 
   const getPageList = () => {
     const pages = [];
-    const lastPage = Math.ceil(total / PAGE_SIZE[pageSize]);
+
+    let start = page - Math.floor(PAGE_BUTTON_COUNT / 2);
+    let end = page + Math.floor(PAGE_BUTTON_COUNT / 2);
+
+    if (end >= lastPage) {
+      start = lastPage - PAGE_BUTTON_COUNT + 1;
+    }
+    if (start <= 1) {
+      start = 1;
+    }
 
     for (
-      let i = page - Math.floor(PAGE_BUTTON_COUNT / 2);
-      i <= page + Math.floor(PAGE_BUTTON_COUNT / 2);
+      let i = start;
+      i <= Math.min(start + PAGE_BUTTON_COUNT - 1, lastPage);
       i++
     ) {
-      if (i > 0 && i <= lastPage) {
-        pages.push(i);
-      }
+      pages.push(i);
     }
 
     if (pages[0] > 1) {
@@ -94,15 +102,11 @@ const List = () => {
     <div className="m-4">
       <div className="flex justify-between flex-wrap items-center mb-3">
         <h1 className="text-[27px]">Search Results </h1>
-        <div>
-          <div className="text-sky-400">
-            <div
-              className="hover:cursor-pointer"
-              onClick={() => setShowTip(!showTip)}
-            >
-              Advanced Search Tips
-            </div>
-          </div>
+        <div
+          className="text-sky-400 hover:cursor-pointer"
+          onClick={() => setShowTip(!showTip)}
+        >
+          Advanced Search Tips
         </div>
       </div>
       <div className="text-[12px] mb-3">
@@ -236,12 +240,12 @@ const List = () => {
           </tbody>
         </table>
       )}
-      <div className="flex items-center mb-3">
+      <div className="flex flex-wrap gap-2 items-center mb-3">
         <div className="flex-1 font-bold mr-2 text-[13px]">
           {total.toLocaleString("en-US")} results{" "}
         </div>
 
-        <div>
+        <div className="ml-auto">
           <div className="flex text-[13px]">
             {ORDER_BY.map((item, index) => (
               <div
@@ -249,8 +253,8 @@ const List = () => {
                 className={`p-2 text-gray-400 border-[0.5px] capitalize border-gray-200 hover:cursor-pointer 
                 ${index === 0 ? "rounded-l" : ""}
                 ${index === ORDER_BY.length - 1 ? "rounded-r" : ""}
-                ${order === index ? "bg-gray-300" : ""}`}
-                onClick={() => setOrder(index)}
+                ${order === item ? "bg-gray-300" : ""}`}
+                onClick={() => setOrder(item)}
               >
                 {item}
               </div>
@@ -261,8 +265,11 @@ const List = () => {
 
       <div className="border-t">
         {posts.map((post, index) => (
-          <div className="flex border-b p-[16px] gap-4 text-[13px]" key={index}>
-            <div className="flex flex-col items-end gap-1">
+          <div
+            className="flex lg:flex-row flex-col border-b p-[16px] gap-4 text-[13px]"
+            key={index}
+          >
+            <div className="flex lg:flex-col lg:items-end items-center gap-1">
               <div className="flex gap-1">
                 <span className="font-[500]">{post["VoteCount"] || 0}</span>
                 <span>votes</span>
@@ -304,10 +311,10 @@ const List = () => {
                 </a>
               </h3>
               <div
-                className="text-[13px] mb-2 line-clamp-2"
+                className="text-[13px] mb-2 line-clamp-2 break-all"
                 dangerouslySetInnerHTML={{ __html: highlight(post["Body"]) }}
               ></div>
-              <div>
+              <div className="flex flex-wrap justify-between items-center gap-2">
                 <div>
                   <ul className="flex gap-2">
                     {getTagList(post["Tags"]).map((tag, index) => (
@@ -323,9 +330,8 @@ const List = () => {
                   </ul>
                 </div>
 
-                <div className="flex gap-2 items-center text-[12px] justify-end mt-2">
+                <div className="flex flex-wrap gap-2 items-center text-[12px] justify-end ml-auto">
                   <a href="/users/87234/gmannickg">
-                    {" "}
                     <div>
                       <img
                         src={avatar}
@@ -365,51 +371,64 @@ const List = () => {
         ))}
       </div>
 
-      <div className="flex my-4 text-[13px] justify-between">
-        <div className="flex gap-1 items-center">
-          {getPageList().map((p) => (
-            <>
-              {p === ELLIPSIS_MARK ? (
-                <div className="mx-2">{p}</div>
-              ) : (
-                <button
-                  className={`p-1 px-2 rounded ${
-                    p === page
-                      ? "bg-yellow-500 text-white"
-                      : "border-gray border-[0.5px] hover:cursor-pointer "
-                  }`}
-                  onClick={() => setPage(p)}
-                >
-                  {p}
-                </button>
-              )}
-            </>
-          ))}
-          <button
-            className="p-1 px-2 rounded border-gray border-[0.5px]"
-            onClick={() => setPage(page + 1)}
-            disabled={page === lastPage}
-          >
-            Next
-          </button>
+      {total > pageSize && (
+        <div className="flex flex-wrap my-4 gap-4 text-[13px] justify-between">
+          <div className="flex gap-1 items-center">
+            {page > 1 && (
+              <button
+                className="p-1 px-2 rounded border-gray border-[0.5px]"
+                onClick={() => setPage(page - 1)}
+              >
+                Prev
+              </button>
+            )}
+            {getPageList().map((p) => (
+              <>
+                {p === ELLIPSIS_MARK ? (
+                  <div className="mx-2">{p}</div>
+                ) : (
+                  <button
+                    className={`p-1 px-2 rounded ${
+                      p === page
+                        ? "bg-yellow-500 text-white"
+                        : "border-gray border-[0.5px] hover:cursor-pointer "
+                    }`}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </button>
+                )}
+              </>
+            ))}
+            {page < lastPage && (
+              <button
+                className="p-1 px-2 rounded border-gray border-[0.5px]"
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+              </button>
+            )}
+          </div>
+          <div className="flex items-center gap-1 ml-auto">
+            {PAGE_SIZE.map((size, index) => (
+              <div
+                key={index}
+                onClick={() => setPageSize(size)}
+                className={`p-1 px-2 rounded hover:cursor-pointer ${
+                  pageSize === size
+                    ? "bg-yellow-500 text-white"
+                    : "border-gray border-[0.5px]"
+                }`}
+              >
+                {size}
+              </div>
+            ))}
+            <span className="px-2">per page</span>
+          </div>
         </div>
-        <div className="flex items-center gap-1">
-          {PAGE_SIZE.map((size, index) => (
-            <div
-              key={index}
-              onClick={() => setPageSize(index)}
-              className={`p-1 px-2 rounded hover:cursor-pointer ${
-                pageSize === index
-                  ? "bg-yellow-500 text-white"
-                  : "border-gray border-[0.5px]"
-              }`}
-            >
-              {size}
-            </div>
-          ))}
-          <span className="px-2">per page</span>
-        </div>
-      </div>
+      )}
+
+      {isLoading && <Loading />}
     </div>
   );
 };

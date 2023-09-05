@@ -2,8 +2,8 @@ import { Link } from "react-router-dom";
 const Footer = () => {
   return (
     <footer className="bg-gray-600">
-      <div className="container mx-auto flex text-[13px] text-gray-400 py-8 px-2">
-        <div className="flex-[0_0_64px]">
+      <div className="container mx-auto flex flex-wrap gap-4 text-[13px] text-gray-400 py-8 px-2">
+        <div className="hidden sm:flex flex-[0_0_64px]">
           <a href="https://stackoverflow.com">
             <svg aria-hidden="true" width="32" height="37" viewBox="0 0 32 37">
               <path d="M26 33v-9h4v13H0V24h4v9h22Z" fill="#BCBBBB"></path>
@@ -14,7 +14,7 @@ const Footer = () => {
             </svg>
           </a>
         </div>
-        <nav className="flex flex-[2_1_auto]">
+        <nav className="flex flex-wrap flex-col sm:flex-row gap-4 flex-[2_1_auto]">
           <div className="flex-[1_0_auto]">
             <h5 className="font-bold uppercase text-white">
               <a href="https://stackoverflow.com">Stack Overflow</a>
