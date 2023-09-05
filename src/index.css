@@ -1,3 +1,31 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.p-body pre {
+  @apply max-h-[600px] bg-gray-200 p-4 overflow-auto w-[500px] mb-[20px];
+}
+
+.p-body p {
+  @apply text-[15px] leading-[22.5px] mb-[16.5px];
+}
+
+.p-body ul {
+  @apply ml-[30px] list-disc mb-[16px];
+}
+
+.p-body li {
+  @apply mb-[8.25px] text-[15px];
+}
+
+.p-body code {
+    @apply bg-gray-200 rounded-sm px-2
+}
+
+.p-body h3 {
+    @apply text-[19px] mb-[14px]
+}
+
+.p-body hr {
+    @apply mt-[8px] mb-[16px]
+}
