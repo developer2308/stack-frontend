@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom";
 const Rightbar = ({ children }) => {
   return (
-    <div className="flex lg:flex lg:min-w-[300px] lg:w-[300px]">
+    <div className="flex min-w-full w-full lg:min-w-[300px] lg:w-[300px] ml-4">
       {children}
     </div>
   );

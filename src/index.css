@@ -19,13 +19,26 @@
 }
 
 .p-body code {
-    @apply bg-gray-200 rounded-sm px-2
+  @apply bg-gray-200 rounded-sm px-2;
 }
 
 .p-body h3 {
-    @apply text-[19px] mb-[14px]
+  @apply text-[19px] mb-[14px];
 }
 
 .p-body hr {
-    @apply mt-[8px] mb-[16px]
+  @apply mt-[8px] mb-[16px];
+}
+
+.p-body a {
+  @apply text-sky-500 underline;
+}
+
+.p-body blockquote {
+  @apply relative ml-[15px] pl-[15px];
+}
+
+.p-body blockquote:before {
+  @apply absolute bottom-0 left-0 top-0 bg-gray-500 block w-[3px] rounded-sm;
+  content: "";
 }

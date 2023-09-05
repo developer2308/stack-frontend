@@ -21,10 +21,10 @@ const Footer = () => {
             </h5>
             <ul>
               <li>
-                <a href="/questions">Questions</a>
+                <a href="/">Questions</a>
               </li>
               <li>
-                <a href="/help">Help</a>
+                <a href="/">Help</a>
               </li>
             </ul>
           </div>

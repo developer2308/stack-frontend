@@ -6,15 +6,23 @@ export const formatDateTime = (timeStr) => {
 };
 
 export const fromNow = (timeStr) => {
-    const time = Moment(timeStr).fromNow();
-    return time;
-  };
+  const time = Moment(timeStr).fromNow();
+  return time;
+};
+
+export const titleStr = (title) => {
+  const removePattern = ["'"];
+  removePattern.forEach((pattern) => {
+    title = title.replace(pattern, "");
+  });
+  return title.toLowerCase().split(" ").join("-");
+};
 
 export const formatNumber = (number) => {
   if (number) {
     const formated = number.toLocaleString("en-US");
     return formated;
   } else {
-    return "";
+    return 0;
   }
 };
