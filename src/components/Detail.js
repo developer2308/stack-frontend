@@ -76,7 +76,7 @@ const Detail = () => {
             </div>
             <div className="nowrap mr-4 mb-2">
               <span className="text-gray-400 mr-1">Modified</span>
-              <span>{fromNow(post["LastEditDate"])}</span>
+              <span>{fromNow(post["LastActivityDate"])}</span>
             </div>
             <div className="nowrap mb-2">
               <span className="text-gray-400 mr-1">Viewed</span>
@@ -114,7 +114,7 @@ const Detail = () => {
                             <div className="text-sky-400">
                               edited
                               <span className="ml-1">
-                                {formatDateTime(post["LastEditDate"])}
+                                {formatDateTime(post["LastActivityDate"])}
                               </span>
                             </div>
                             <div className="flex gap-2 items-center">

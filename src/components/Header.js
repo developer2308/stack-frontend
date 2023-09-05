@@ -32,7 +32,7 @@ const Header = () => {
             <span className="font-bold text-black">overflow</span>
           </div>
         </a>
-        <div className="flex w-full relative">
+        <div className="flex w-full">
           <form className="flex w-full relative" onSubmit={onSubmit}>
             <input
               name="q"
