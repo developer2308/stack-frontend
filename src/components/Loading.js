@@ -1,7 +1,7 @@
 const Loading = () => {
   return (
-    <div className="fixed top-[50%] left-[50%]">
-      <div className="bg-gray-300/75 p-4 px-8 rounded-lg">
+    <div className="fixed top-[calc(50%-150px)] left-[calc(50%-150px)] w-[300px] h-[200px] flex items-center justify-center">
+      <div className="bg-sky-400/75 p-4 px-8 rounded-lg">
         <svg
           className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-yellow-500"
           viewBox="0 0 100 101"

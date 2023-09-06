@@ -1,12 +1,14 @@
 import { useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { getSiteInfo } from "../helper";
 
 const Header = () => {
   const [searchParams] = useSearchParams();
 
-  const [text, setText] = useState(searchParams.get("q"));
+  const [text, setText] = useState(searchParams.get("q") || "");
 
   const navigate = useNavigate();
+  const siteInfo = getSiteInfo();
 
   const onChange = (event) => {
     setText(event.target.value);
@@ -20,19 +22,19 @@ const Header = () => {
     <div className="fixed top-0 border-b w-full items-center h-[56px] border-t-[3px] border-t-yellow-500 bg-white">
       <div className="container mx-auto flex w-full items-center h-[56px] gap-2 text-gray-500 px-2">
         <a href="/" className="flex items-center gap-1">
-          <svg aria-hidden="true" width="32" height="37" viewBox="0 0 32 37">
-            <path d="M26 33v-9h4v13H0V24h4v9h22Z" fill="#BCBBBB"></path>
-            <path
-              d="m21.5 0-2.7 2 9.9 13.3 2.7-2L21.5 0ZM26 18.4 13.3 7.8l2.1-2.5 12.7 10.6-2.1 2.5ZM9.1 15.2l15 7 1.4-3-15-7-1.4 3Zm14 10.79.68-2.95-16.1-3.35L7 23l16.1 2.99ZM23 30H7v-3h16v3Z"
-              fill="#F48024"
-            ></path>
-          </svg>
-          <div className="hidden sm:inline">
-            <span className="mr-1">stack</span>
-            <span className="font-bold text-black">overflow</span>
+          <img
+            width="32"
+            height="37"
+            src={
+              process.env.PUBLIC_URL + `/images/site_icon_${siteInfo["id"]}.png`
+            }
+            alt={siteInfo["name"]}
+          />
+          <div className="">
+            <span className="font-bold text-black">{siteInfo["name"]}</span>
           </div>
         </a>
-        <div className="flex w-full">
+        <div className="flex flex-1">
           <form className="flex w-full relative" onSubmit={onSubmit}>
             <input
               name="q"
@@ -52,6 +54,11 @@ const Header = () => {
             </svg>
           </form>
         </div>
+        <a href="/sites">
+          <svg width="18" height="18" viewBox="0 0 18 18">
+            <path d="M15 1H3a2 2 0 0 0-2 2v2h16V3a2 2 0 0 0-2-2ZM1 13c0 1.1.9 2 2 2h8v3l3-3h1a2 2 0 0 0 2-2v-2H1v2Zm16-7H1v4h16V6Z"></path>
+          </svg>
+        </a>
       </div>
     </div>
   );

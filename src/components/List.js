@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Loading from "./Loading";
 import Rightbar from "./Rightbar";
-import { formatDateTime, formatNumber, titleStr } from "../helper";
+import { formatDateTime, formatNumber, getSiteInfo, titleStr } from "../helper";
 import { useSearchParams } from "react-router-dom";
 
 const ORDER_BY = ["relevance", "newest", "active", "score"];
@@ -29,7 +29,8 @@ const List = () => {
         return;
       }
       setIsLoading(true);
-      const url = `${process.env.REACT_APP_API_HOST}/posts/search?q=${query}&tab=${order}&pagesize=${pageSize}&page=${page}`;
+      const siteInfo = getSiteInfo();
+      const url = `${process.env.REACT_APP_API_HOST}/posts/search?site=${siteInfo["id"]}&q=${query}&tab=${order}&pagesize=${pageSize}&page=${page}`;
       console.log(url, process.env.NODE_ENV);
       const res = await fetch(url);
       const json = await res.json();
@@ -106,7 +107,7 @@ const List = () => {
         <div className="flex justify-between flex-wrap items-center mb-3">
           <h1 className="text-[27px]">Search Results </h1>
           <div
-            className="text-sky-400 hover:cursor-pointer"
+            className="text-sky-400 hover:cursor-pointer hidden"
             onClick={() => setShowTip(!showTip)}
           >
             Advanced Search Tips
@@ -309,7 +310,7 @@ const List = () => {
                   <div className="flex lg:flex-col lg:items-end items-center gap-1">
                     <div className="flex gap-1">
                       <span className="font-[500]">
-                        {formatNumber(post["VoteCount"]) || 0}
+                        {formatNumber(post["Score"]) || 0}
                       </span>
                       <span>votes</span>
                     </div>
@@ -399,8 +400,8 @@ const List = () => {
                         </div>
 
                         <time>
-                          asked{" "}
-                          <span>{formatDateTime(post["CreationDate"])}</span>
+                          {post["PostTypeId"] === 1 ? "asked" : "answered"}
+                          <span className="ml-1">{formatDateTime(post["CreationDate"])}</span>
                         </time>
                       </div>
                     </div>
@@ -420,8 +421,8 @@ const List = () => {
                       Prev
                     </button>
                   )}
-                  {getPageList().map((p) => (
-                    <>
+                  {getPageList().map((p, index) => (
+                    <div key={index}>
                       {p === ELLIPSIS_MARK ? (
                         <div className="mx-2">{p}</div>
                       ) : (
@@ -436,7 +437,7 @@ const List = () => {
                           {p}
                         </button>
                       )}
-                    </>
+                    </div>
                   ))}
                   {page < lastPage && (
                     <button

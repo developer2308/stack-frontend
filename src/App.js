@@ -4,6 +4,7 @@ import Layout from "./components/Layout";
 import List from "./components/List";
 import Detail from "./components/Detail";
 import Error from "./components/Error";
+import Sites from "./components/Sites";
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Route index element={<List />} />
           <Route path="/search" element={<List />} />
           <Route path="/questions/:id/:title?" element={<Detail />} />
+          <Route path="/sites" element={<Sites />} />
           <Route path="*" element={<Error />} />
         </Route>
       </Routes>
