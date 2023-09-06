@@ -55,7 +55,7 @@ const Sites = () => {
       ) : (
         <div>
           {sites.map((site, index) => (
-            <div key={index} className="flex flex-col md:flex-row gap-4 p-2 border-b-[0.5px] md:border-0">
+            <div key={index} className="flex flex-col lg:flex-row gap-4 p-2 border-b-[0.5px] md:border-0">
               <div className="flex flex-1">
                 <a href={site["Url"]}>
                   <img

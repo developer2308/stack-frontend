@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import avatar from "../images/avatar.png";
 import Rightbar from "./Rightbar";
 import Loading from "./Loading";
@@ -21,7 +21,7 @@ const SORT_BY_LIST = {
 };
 
 const Detail = () => {
-  const { id } = useParams();
+  const { id, answerid } = useParams();
 
   const [post, setPost] = useState();
   const [isLoading, setIsLoading] = useState(false);
@@ -272,7 +272,7 @@ const Detail = () => {
                     </div>
                   </div>
                   {sortedAnswers().map((answer, index) => (
-                    <Answer answer={answer} key={index} />
+                    <Answer answer={answer} key={index} selected={answerid && answerid == answer['Id']}/>
                   ))}
                 </div>
               </div>

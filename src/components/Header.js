@@ -19,7 +19,7 @@ const Header = () => {
   };
 
   return (
-    <div className="fixed top-0 border-b w-full items-center h-[56px] border-t-[3px] border-t-yellow-500 bg-white">
+    <div className="fixed top-0 border-b w-full items-center h-[56px] border-t-[3px] border-t-yellow-500 bg-white z-10">
       <div className="container mx-auto flex w-full items-center h-[56px] gap-2 text-gray-500 px-2">
         <a href="/" className="flex items-center gap-1">
           <img

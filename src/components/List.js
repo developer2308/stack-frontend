@@ -55,7 +55,7 @@ const List = () => {
   };
 
   const highlight = (body) => {
-    let result = body;
+    let result = body || "";
     const removePatterns = [/<\/?[^>]+(>|$)/gi];
     removePatterns.forEach((pattern) => {
       result = result.replace(pattern, "");
@@ -99,6 +99,20 @@ const List = () => {
       pages.push(lastPage);
     }
     return pages;
+  };
+
+  const isAnswer = (post) => {
+    return post["PostTypeId"] === 2;
+  };
+
+  const postUrl = (post) => {
+    let url = `/questions/${post["Id"]}/${titleStr(post["Title"])}`;
+    if (isAnswer(post)) {
+      url = `/questions/${post["parent"]["Id"]}/${titleStr(
+        post["parent"]["Title"]
+      )}/${post["Id"]}`;
+    }
+    return url;
   };
 
   return (
@@ -307,31 +321,57 @@ const List = () => {
                   className="flex lg:flex-row flex-col border-b p-[16px] gap-4 text-[13px]"
                   key={index}
                 >
-                  <div className="flex lg:flex-col lg:items-end items-center gap-1">
+                  <div className="flex lg:flex-col lg:items-end items-center gap-1 min-w-[108px] mt-[3px]">
                     <div className="flex gap-1">
                       <span className="font-[500]">
                         {formatNumber(post["Score"]) || 0}
                       </span>
                       <span>votes</span>
                     </div>
-                    <div className="flex items-center bg-green-800 text-white rounded p-[1px] gap-1 px-2">
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        className="inline fill-white"
-                      >
-                        <path d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"></path>
-                      </svg>{" "}
-                      <span>{post["AnswerCount"]}</span>
-                      <span>answers</span>
-                    </div>
-                    <div className="flex gap-1 text-red-700">
-                      <span className="font-[500]">
-                        {formatNumber(post["ViewCount"])}
-                      </span>
-                      <span>views</span>
-                    </div>
+                    {!isAnswer(post) && (
+                      <>
+                        <div
+                          className={`flex items-center ${
+                            post["AcceptedAnswerId"]
+                              ? "bg-green-800 text-white"
+                              : "text-green-800 border-green-800 border-[1px]"
+                          }  rounded p-[1px] gap-1 px-2`}
+                        >
+                          {post["AcceptedAnswerId"] && (
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 14 14"
+                              className="inline fill-white"
+                            >
+                              <path d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"></path>
+                            </svg>
+                          )}
+                          <span>{post["AnswerCount"]}</span>
+                          <span>answers</span>
+                        </div>
+                        <div className="flex gap-1 text-red-700">
+                          <span className="font-[500]">
+                            {formatNumber(post["ViewCount"])}
+                          </span>
+                          <span>views</span>
+                        </div>
+                      </>
+                    )}
+                    {isAnswer(post) &&
+                      post["Id"] === post["parent"]["AcceptedAnswerId"] && (
+                        <div className="flex items-center bg-green-800 text-white rounded p-[1px] gap-1 px-2">
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 14 14"
+                            className="inline fill-white"
+                          >
+                            <path d="M13 3.41 11.59 2 5 8.59 2.41 6 1 7.41l4 4 8-8Z"></path>
+                          </svg>
+                          <span>accepted</span>
+                        </div>
+                      )}
                   </div>
                   <div>
                     <h3 className="mb-1">
@@ -346,12 +386,13 @@ const List = () => {
                         </svg>
                       </span>
                       <a
-                        href={`/questions/${post["Id"]}/${titleStr(
-                          post["Title"]
-                        )}`}
+                        href={postUrl(post)}
                         className="text-sky-400 text-[17px] ml-1"
                       >
-                        {post["Title"]}
+                        {isAnswer(post)
+                          ? post["parent"]["Title"]
+                          : post["Title"]}
+                        {post["ClosedDate"] ? " [closed]" : ""}
                       </a>
                     </h3>
                     <div
@@ -400,8 +441,10 @@ const List = () => {
                         </div>
 
                         <time>
-                          {post["PostTypeId"] === 1 ? "asked" : "answered"}
-                          <span className="ml-1">{formatDateTime(post["CreationDate"])}</span>
+                          {!isAnswer(post) ? "asked" : "answered"}
+                          <span className="ml-1">
+                            {formatDateTime(post["CreationDate"])}
+                          </span>
                         </time>
                       </div>
                     </div>

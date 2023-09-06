@@ -11,6 +11,9 @@ export const fromNow = (timeStr) => {
 };
 
 export const titleStr = (title) => {
+  if (!title) {
+    return ''
+  }
   const removePattern = [/['/?.+,"]/gi];
   removePattern.forEach((pattern) => {
     title = title.replace(pattern, "");

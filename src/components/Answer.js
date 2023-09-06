@@ -1,10 +1,25 @@
 import { formatDateTime } from "../helper";
 import Vote from "./Vote";
 import avatar from "../images/avatar.png";
+import { useEffect, useRef } from "react";
 
-const Answer = ({ answer }) => {
+const Answer = ({ answer, selected }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    if (selected) {
+      window.scrollTo({
+        top: ref.current.offsetTop - 56,
+        behavior: "smooth"
+      });
+    }
+  }, [selected]);
+
   return (
-    <div className="flex flex-col items-center border-b-[0.5px] py-[16px]">
+    <div
+      className="flex flex-col items-center border-b-[0.5px] py-[16px]"
+      ref={ref}
+    >
       <div className="flex gap-4">
         <Vote score={answer["Score"]} />
         <div className="answer-body flex flex-col">
