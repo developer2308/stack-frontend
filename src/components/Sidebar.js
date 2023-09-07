@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 const Sidebar = () => {
   return (
     <div className="hidden md:flex min-w-[164px] py-4 w-[164px] border-r-[0.5px] ">

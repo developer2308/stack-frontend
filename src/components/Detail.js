@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Rightbar from "./Rightbar";
 import Loading from "./Loading";
@@ -134,13 +134,13 @@ const Detail = () => {
                                 </div>
                                 <div className="user-details">
                                   <span className="text-sky-400">
-                                    {post["editor"]?.["DisplayName"]}
+                                    {post["editor"]["DisplayName"]}
                                   </span>
                                   <div className="flex gap-1">
                                     <span className="font-bold">
-                                      {post["editor"]?.["Reputation"]}
+                                      {post["editor"]["Reputation"]}
                                     </span>
-                                    {post["editor"]?.["Badges"][1] && (
+                                    {post["editor"]["Badges"][1] && (
                                       <span>
                                         <span className="text-yellow-500">
                                           ●
@@ -150,7 +150,7 @@ const Detail = () => {
                                         </span>
                                       </span>
                                     )}
-                                    {post["editor"]?.["Badges"][2] && (
+                                    {post["editor"]["Badges"][2] && (
                                       <span>
                                         <span className="text-gray-500">●</span>
                                         <span className="ml-1">
@@ -158,7 +158,7 @@ const Detail = () => {
                                         </span>
                                       </span>
                                     )}
-                                    {post["editor"]?.["Badges"][3] && (
+                                    {post["editor"]["Badges"][3] && (
                                       <span>
                                         <span className="text-orange-500">
                                           ●
@@ -192,13 +192,13 @@ const Detail = () => {
                               </div>
                               <div className="user-details">
                                 <span className="text-sky-400">
-                                  {post["owner"]?.["DisplayName"]}
+                                  {post["owner"]["DisplayName"]}
                                 </span>
                                 <div className="flex gap-1">
                                   <span className="font-bold">
-                                    {post["owner"]?.["Reputation"]}
+                                    {post["owner"]["Reputation"]}
                                   </span>
-                                  {post["owner"]?.["Badges"][1] && (
+                                  {post["owner"]["Badges"][1] && (
                                     <span>
                                       <span className="text-yellow-500">●</span>
                                       <span className="ml-1">
@@ -206,7 +206,7 @@ const Detail = () => {
                                       </span>
                                     </span>
                                   )}
-                                  {post["owner"]?.["Badges"][2] && (
+                                  {post["owner"]["Badges"][2] && (
                                     <span>
                                       <span className="text-gray-500">●</span>
                                       <span className="ml-1">
@@ -214,7 +214,7 @@ const Detail = () => {
                                       </span>
                                     </span>
                                   )}
-                                  {post["owner"]?.["Badges"][3] && (
+                                  {post["owner"]["Badges"][3] && (
                                     <span>
                                       <span className="text-orange-500">●</span>
                                       <span className="ml-1">
@@ -237,7 +237,7 @@ const Detail = () => {
                     <div className="answers-subheader flex items-center mb-2 flex-wrap justify-between w-full">
                       <div className="">
                         <h2 className="text-[19px]">
-                          {post["answers"]?.length} Answers
+                          {post["answers"].length} Answers
                         </h2>
                       </div>
                       <div className="text-[12px]">
@@ -272,17 +272,17 @@ const Detail = () => {
                     </div>
                   </div>
                   {sortedAnswers().map((answer, index) => (
-                    <Answer answer={answer} key={index} selected={answerid && answerid == answer['Id']}/>
+                    <Answer answer={answer} key={index} selected={answerid && answerid === answer['Id'] + ''}/>
                   ))}
                 </div>
               </div>
             </div>
             <Rightbar>
-              {!!post["linked"]?.length && (
+              {!!post["linked"].length && (
                 <div className="module sidebar-linked">
                   <h4 className="mb-5 text-[19px]">Linked</h4>
                   <div className="flex flex-col gap-2">
-                    {post["linked"]?.map((linked, index) => (
+                    {post["linked"].map((linked, index) => (
                       <div key={index} className="flex items-center gap-2">
                         <div className="bg-green-600 rounded w-[38px] min-w-[38px] items-center justify-center text-white py-1 flex text-[12px]">
                           {linked["Score"]}

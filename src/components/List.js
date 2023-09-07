@@ -56,10 +56,16 @@ const List = () => {
 
   const highlight = (body) => {
     let result = body || "";
-    const removePatterns = [/<\/?[^>]+(>|$)/gi];
-    removePatterns.forEach((pattern) => {
-      result = result.replace(pattern, "");
-    });
+    if (query) {
+      const querys = query.split(" ");
+      querys.forEach((q) => {
+        const pattern = new RegExp(q, "gi");
+        result = result.replace(
+          pattern,
+          (match) => `<span class="font-bold">${match}</span>`
+        );
+      });
+    }
 
     return result;
   };
@@ -286,33 +292,37 @@ const List = () => {
         </div>
 
         {!posts || !posts.length ? (
-          <div className="page-description p-6 m-0">
-            <div className="flex flex-col items-center">
-              <svg
-                className="fc-black-200 svg-spot spotSearchLg"
-                width="96"
-                height="96"
-                viewBox="0 0 96 96"
-              >
-                <path
-                  d="M60.38 76.15a6.2 6.2 0 1 1 8.77-8.77l17.78 17.79a6.2 6.2 0 0 1-8.76 8.76L60.38 76.15Z"
-                  opacity=".2"
-                ></path>
-                <path d="M52.17 13.27a1.5 1.5 0 0 0-1.5 2.6A25.5 25.5 0 0 1 63 32.97a1.5 1.5 0 1 0 2.94-.59 28.5 28.5 0 0 0-13.77-19.1ZM36.64 11c0-.84.67-1.5 1.5-1.5 1.8 0 3.59.19 5.35.53a1.5 1.5 0 1 1-.58 2.95 25.5 25.5 0 0 0-4.78-.48 1.5 1.5 0 0 1-1.5-1.5ZM38 1.5a36.5 36.5 0 1 0 22.3 65.4 6.47 6.47 0 0 0 1.9 4.48l19.15 19.15a6.5 6.5 0 0 0 9.18-9.18L71.38 62.2a6.47 6.47 0 0 0-4.48-1.9A36.5 36.5 0 0 0 38 1.5ZM4.5 38a33.5 33.5 0 1 1 67 0 33.5 33.5 0 0 1-67 0Zm59.83 31.26a3.5 3.5 0 0 1 4.93-4.93l19.15 19.14a3.5 3.5 0 1 1-4.94 4.94L64.33 69.26Z"></path>
-              </svg>
-              <div className="mt-3">
-                We couldn't find anything for <b>{query}</b>
-              </div>
-              <div className="mt-1 text-[13px]">
-                <strong>Search options:</strong>
-                not deleted
-              </div>
+          <>
+            {!isLoading && (
+              <div className="page-description p-6 m-0">
+                <div className="flex flex-col items-center">
+                  <svg
+                    className="fc-black-200 svg-spot spotSearchLg"
+                    width="96"
+                    height="96"
+                    viewBox="0 0 96 96"
+                  >
+                    <path
+                      d="M60.38 76.15a6.2 6.2 0 1 1 8.77-8.77l17.78 17.79a6.2 6.2 0 0 1-8.76 8.76L60.38 76.15Z"
+                      opacity=".2"
+                    ></path>
+                    <path d="M52.17 13.27a1.5 1.5 0 0 0-1.5 2.6A25.5 25.5 0 0 1 63 32.97a1.5 1.5 0 1 0 2.94-.59 28.5 28.5 0 0 0-13.77-19.1ZM36.64 11c0-.84.67-1.5 1.5-1.5 1.8 0 3.59.19 5.35.53a1.5 1.5 0 1 1-.58 2.95 25.5 25.5 0 0 0-4.78-.48 1.5 1.5 0 0 1-1.5-1.5ZM38 1.5a36.5 36.5 0 1 0 22.3 65.4 6.47 6.47 0 0 0 1.9 4.48l19.15 19.15a6.5 6.5 0 0 0 9.18-9.18L71.38 62.2a6.47 6.47 0 0 0-4.48-1.9A36.5 36.5 0 0 0 38 1.5ZM4.5 38a33.5 33.5 0 1 1 67 0 33.5 33.5 0 0 1-67 0Zm59.83 31.26a3.5 3.5 0 0 1 4.93-4.93l19.15 19.14a3.5 3.5 0 1 1-4.94 4.94L64.33 69.26Z"></path>
+                  </svg>
+                  <div className="mt-3">
+                    We couldn't find anything for <b>{query}</b>
+                  </div>
+                  <div className="mt-1 text-[13px]">
+                    <strong>Search options:</strong>
+                    not deleted
+                  </div>
 
-              <div className="mt-1 text-[13px] text-gray-500">
-                Try different or less specific keywords.
+                  <div className="mt-1 text-[13px] text-gray-500">
+                    Try different or less specific keywords.
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         ) : (
           <>
             <div className="">
@@ -376,14 +386,25 @@ const List = () => {
                   <div>
                     <h3 className="mb-1">
                       <span>
-                        <svg
-                          width="18"
-                          height="18"
-                          className="inline mb-1"
-                          viewBox="0 0 18 18"
-                        >
-                          <path d="m4 15-3 3V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v9c0 1.09-.91 2-2 2H4Zm7.75-3.97c.72-.83.98-1.86.98-2.94 0-1.65-.7-3.22-2.3-3.83a4.41 4.41 0 0 0-3.02 0 3.8 3.8 0 0 0-2.32 3.83c0 1.29.35 2.29 1.03 3a3.8 3.8 0 0 0 2.85 1.07c.62 0 1.2-.11 1.71-.34.65.44 1 .68 1.06.7.23.13.46.23.7.3l.59-1.13a5.2 5.2 0 0 1-1.28-.66Zm-1.27-.9a5.4 5.4 0 0 0-1.5-.8l-.45.9c.33.12.66.29.98.5-.2.07-.42.11-.65.11-.61 0-1.12-.23-1.52-.68-.86-1-.86-3.12 0-4.11.8-.9 2.35-.9 3.15 0 .9 1.01.86 3.03-.01 4.08Z"></path>
-                        </svg>
+                        {!isAnswer(post) ? (
+                          <svg
+                            width="18"
+                            height="18"
+                            className="inline mb-1"
+                            viewBox="0 0 18 18"
+                          >
+                            <path d="m4 15-3 3V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v9c0 1.09-.91 2-2 2H4Zm7.75-3.97c.72-.83.98-1.86.98-2.94 0-1.65-.7-3.22-2.3-3.83a4.41 4.41 0 0 0-3.02 0 3.8 3.8 0 0 0-2.32 3.83c0 1.29.35 2.29 1.03 3a3.8 3.8 0 0 0 2.85 1.07c.62 0 1.2-.11 1.71-.34.65.44 1 .68 1.06.7.23.13.46.23.7.3l.59-1.13a5.2 5.2 0 0 1-1.28-.66Zm-1.27-.9a5.4 5.4 0 0 0-1.5-.8l-.45.9c.33.12.66.29.98.5-.2.07-.42.11-.65.11-.61 0-1.12-.23-1.52-.68-.86-1-.86-3.12 0-4.11.8-.9 2.35-.9 3.15 0 .9 1.01.86 3.03-.01 4.08Z"></path>
+                          </svg>
+                        ) : (
+                          <svg
+                            className="inline mb-1"
+                            width="18"
+                            height="18"
+                            viewBox="0 0 18 18"
+                          >
+                            <path d="M14 15H3c-1.09 0-2-.91-2-2V4c0-1.1.9-2 2-2h12c1.09 0 2 .91 2 2v14l-3-3Zm-1.02-3L9.82 4H8.14l-3.06 8h1.68l.65-1.79h3.15l.69 1.79h1.73Zm-2.93-3.12H7.9l1.06-2.92 1.09 2.92Z"></path>
+                          </svg>
+                        )}
                       </span>
                       <a
                         href={postUrl(post)}

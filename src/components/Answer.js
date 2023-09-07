@@ -10,7 +10,7 @@ const Answer = ({ answer, selected }) => {
     if (selected) {
       window.scrollTo({
         top: ref.current.offsetTop - 56,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   }, [selected]);
