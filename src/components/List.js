@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import avatar from "../images/avatar.png";
 import Loading from "./Loading";
 import Rightbar from "./Rightbar";
-import { formatDateTime, formatNumber, getSiteInfo, titleStr } from "../helper";
+import { formatDateTime, formatNumber, getSiteInfo, splitToWords, titleStr } from "../helper";
 import { useSearchParams } from "react-router-dom";
 
 const ORDER_BY = ["relevance", "newest", "active", "score"];
@@ -57,7 +57,7 @@ const List = () => {
   const highlight = (body) => {
     let result = body || "";
     if (query) {
-      const querys = query.split(" ");
+      const querys = splitToWords(query);
       querys.forEach((q) => {
         const pattern = new RegExp(q, "gi");
         result = result.replace(

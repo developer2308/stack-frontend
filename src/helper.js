@@ -30,6 +30,10 @@ export const formatNumber = (number) => {
   }
 };
 
+export const splitToWords = (query) => {
+  return query.split(" ").filter((w) => !!w);
+};
+
 export const formatCount = (num, digits = 0) => {
   const lookup = [
     { value: 1, symbol: "" },
