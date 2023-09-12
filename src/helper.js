@@ -14,7 +14,7 @@ export const titleStr = (title) => {
   if (!title) {
     return ''
   }
-  const removePattern = [/['/?.+,"]/gi];
+  const removePattern = [/[^a-zA-Z0-9 ]/gi];
   removePattern.forEach((pattern) => {
     title = title.replace(pattern, "");
   });

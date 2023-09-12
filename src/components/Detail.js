@@ -71,7 +71,7 @@ const Detail = () => {
   return (
     <div className="flex flex-1 w-full">
       {post && (
-        <div className="m-8 flex-1">
+        <div className="m-4 md:m-8 flex-1">
           <div className="flex flex-col border-b-[0.5px]">
             <h1 className="text-[27px]">{post["Title"]}</h1>
             <div className="flex flex-wrap gap-2 text-[13px] text-gray-600">
@@ -101,7 +101,7 @@ const Detail = () => {
                     ></div>
                     <div className="flex flex-col gap-2">
                       <div>
-                        <ul className="flex gap-2">
+                        <ul className="flex flex-wrap gap-2">
                           {getTagList(post["Tags"]).map((tag, index) => (
                             <li key={index}>
                               <span className="rounded bg-sky-200 py-1 px-2 text-[12px] text-sky-600">

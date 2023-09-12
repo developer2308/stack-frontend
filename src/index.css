@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .p-body pre {
-  @apply max-h-[600px] bg-gray-200 p-4 overflow-auto w-[500px] mb-[20px];
+  @apply max-h-[600px] bg-gray-200 p-4 overflow-auto w-[250px] md:w-[500px] lg:w-[750px] mb-[20px];
 }
 
 .p-body p {

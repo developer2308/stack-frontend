@@ -30,7 +30,7 @@ const List = () => {
       }
       setIsLoading(true);
       const siteInfo = getSiteInfo();
-      const url = `${process.env.REACT_APP_API_HOST}/posts/search?site=${siteInfo["id"]}&q=${query}&tab=${order}&pagesize=${pageSize}&page=${page}`;
+      const url = `${process.env.REACT_APP_API_HOST}/posts/elastic?site=${siteInfo["id"]}&q=${query}&tab=${order}&pagesize=${pageSize}&page=${page}`;
       console.log(url, process.env.NODE_ENV);
       const res = await fetch(url);
       const json = await res.json();
@@ -419,7 +419,7 @@ const List = () => {
                     <div
                       className="text-[13px] mb-2 line-clamp-2 break-all"
                       dangerouslySetInnerHTML={{
-                        __html: highlight(post["Body"]),
+                        __html: post["Body"],
                       }}
                     ></div>
                     <div className="flex flex-wrap justify-between items-center gap-2">
